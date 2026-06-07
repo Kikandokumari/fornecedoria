@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FornecedorIA</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+margin:0;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+background:#16a34a;
+color:white;
+border:none;
+border-radius:8px;
+font-size:16px;
+}
+
+#resultado{
+margin-top:20px;
+padding:15px;
+background:#f0fdf4;
+border-radius:8px;
+display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>FornecedorIA</h1>
+
+<input id="produto" placeholder="Ex: fornecedor de bebidas">
+
+<input id="cidade" placeholder="Ex: Uberlândia">
+
+<button onclick="buscar()">
+Buscar Fornecedores
+</button>
+
+<div id="resultado"></div>
+
+</div>
+
+<script>
+function buscar(){
+
+let produto=document.getElementById("produto").value;
+let cidade=document.getElementById("cidade").value;
+
+document.getElementById("resultado").style.display="block";
+
+document.getElementById("resultado").innerHTML=
+`
+<h3>Busca realizada</h3>
+
+<p><b>Produto:</b> ${produto}</p>
+
+<p><b>Cidade:</b> ${cidade}</p>
+
+<p>Próximo passo: conectar com Gemini API.</p>
+`;
+}
+</script>
+
+</body>
+</html>
