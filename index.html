@@ -7,50 +7,61 @@
 
 <style>
 body{
-font-family:Arial,sans-serif;
-background:#f5f5f5;
-margin:0;
-padding:20px;
+  font-family: Arial, sans-serif;
+  background:#f4f5f7;
+  margin:0;
+  padding:20px;
+  color:#111;
 }
 
 .container{
-max-width:700px;
-margin:auto;
-background:white;
-padding:20px;
-border-radius:12px;
-box-shadow:0 0 10px rgba(0,0,0,.1);
+  max-width:720px;
+  margin:auto;
+  background:white;
+  padding:24px;
+  border-radius:14px;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
 }
 
 h1{
-text-align:center;
+  text-align:center;
+  margin-bottom:8px;
+}
+
+p{
+  text-align:center;
+  color:#555;
 }
 
 input{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:1px solid #ddd;
-border-radius:8px;
+  width:100%;
+  padding:13px;
+  margin-top:12px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  font-size:15px;
 }
 
 button{
-width:100%;
-padding:12px;
-margin-top:15px;
-background:#16a34a;
-color:white;
-border:none;
-border-radius:8px;
-font-size:16px;
+  width:100%;
+  padding:14px;
+  margin-top:16px;
+  background:#16a34a;
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  font-weight:bold;
 }
 
 #resultado{
-margin-top:20px;
-padding:15px;
-background:#f0fdf4;
-border-radius:8px;
-display:none;
+  margin-top:22px;
+  padding:18px;
+  background:#f0fdf4;
+  border-radius:10px;
+  white-space:pre-wrap;
+  display:none;
+  line-height:1.5;
 }
 </style>
 </head>
@@ -58,38 +69,49 @@ display:none;
 <body>
 
 <div class="container">
-<h1>FornecedorIA</h1>
+  <h1>FornecedorIA</h1>
+  <p>Encontre fornecedores para seu negócio usando IA.</p>
 
-<input id="produto" placeholder="Ex: fornecedor de bebidas">
+  <input id="produto" placeholder="Ex: fornecedor de bebidas">
+  <input id="cidade" placeholder="Ex: Uberlândia">
 
-<input id="cidade" placeholder="Ex: Uberlândia">
+  <button onclick="buscar()">Buscar fornecedores</button>
 
-<button onclick="buscar()">
-Buscar Fornecedores
-</button>
-
-<div id="resultado"></div>
-
+  <div id="resultado"></div>
 </div>
 
 <script>
-function buscar(){
+async function buscar() {
+  const produto = document.getElementById("produto").value.trim();
+  const cidade = document.getElementById("cidade").value.trim();
+  const resultado = document.getElementById("resultado");
 
-let produto=document.getElementById("produto").value;
-let cidade=document.getElementById("cidade").value;
+  if (!produto || !cidade) {
+    alert("Preencha o produto e a cidade.");
+    return;
+  }
 
-document.getElementById("resultado").style.display="block";
+  resultado.style.display = "block";
+  resultado.innerText = "Pesquisando fornecedores com IA...";
 
-document.getElementById("resultado").innerHTML=
-`
-<h3>Busca realizada</h3>
+  try {
+    const resposta = await fetch("/api/buscar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        busca: `${produto} em ${cidade}`
+      })
+    });
 
-<p><b>Produto:</b> ${produto}</p>
+    const dados = await resposta.json();
 
-<p><b>Cidade:</b> ${cidade}</p>
+    resultado.innerText = dados.resultado || dados.erro || "Nenhum resultado encontrado.";
 
-<p>Próximo passo: conectar com Gemini API.</p>
-`;
+  } catch (erro) {
+    resultado.innerText = "Erro ao buscar fornecedores. Tente novamente.";
+  }
 }
 </script>
 
