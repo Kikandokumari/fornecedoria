@@ -18,48 +18,56 @@ export default async function handler(req, res) {
 
     if (!apiKey) {
       return res.status(500).json({
-        erro: "Chave GEMINI_API_KEY não configurada no Vercel."
+        erro: "GEMINI_API_KEY não configurada no Vercel."
       });
     }
 
     const prompt = `
-Você é uma IA que ajuda pessoas a encontrar fornecedores.
+Você é uma IA que ajuda empreendedores a encontrar fornecedores.
 
-O usuário pesquisou:
+Pesquisa do usuário:
 "${busca}"
 
 Responda em português do Brasil.
 
-IMPORTANTE:
+Regras:
 - Não invente telefone.
-- Se não souber telefone ou site, escreva "não encontrado".
-- Dê sugestões de tipos de fornecedores e formas de procurar.
-- Organize a resposta de forma limpa.
+- Não invente site.
+- Se não souber telefone ou site, coloque "não encontrado".
+- Dê caminhos reais de busca e tipos de empresas que a pessoa deve procurar.
+- Seja direto e útil.
 
 Formato:
 
-FORNECEDORES E CAMINHOS RECOMENDADOS
+FORNECEDORES RECOMENDADOS
 
-1. Nome ou tipo de fornecedor:
+1. Tipo/Nome:
 Cidade:
 Telefone:
 Site:
 O que fornece:
 Observação:
 
-2. Nome ou tipo de fornecedor:
+2. Tipo/Nome:
 Cidade:
 Telefone:
 Site:
 O que fornece:
 Observação:
 
-No final, adicione:
-"Dica: confirme preços, entrega mínima e disponibilidade direto com o fornecedor."
+3. Tipo/Nome:
+Cidade:
+Telefone:
+Site:
+O que fornece:
+Observação:
+
+DICA FINAL:
+Confirme preços, pedido mínimo, entrega e disponibilidade diretamente com o fornecedor.
 `;
 
     const resposta = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
