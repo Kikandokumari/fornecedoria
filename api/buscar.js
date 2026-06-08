@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
     if (!busca) {
       return res.status(400).json({
-        erro: "Busca não enviada."
+        erro: "Informe uma busca."
       });
     }
 
@@ -18,56 +18,28 @@ export default async function handler(req, res) {
 
     if (!apiKey) {
       return res.status(500).json({
-        erro: "GEMINI_API_KEY não configurada no Vercel."
+        erro: "GEMINI_API_KEY não encontrada."
       });
     }
 
     const prompt = `
-Você é uma IA para ajudar empreendedores a encontrar fornecedores.
+Encontre fornecedores para:
 
-Pesquisa do usuário:
-"${busca}"
+${busca}
 
-Responda em português do Brasil.
+Retorne:
 
-Regras:
-- Não invente telefone.
-- Não invente site.
-- Se não tiver certeza, escreva "não encontrado".
-- Dê sugestões úteis de onde procurar.
-- Seja direto.
+- Nome da empresa
+- Cidade
+- Telefone (se existir)
+- Site (se existir)
+- O que fornece
 
-Formato:
-
-FORNECEDORES RECOMENDADOS
-
-1. Tipo/Nome:
-Cidade:
-Telefone:
-Site:
-O que fornece:
-Observação:
-
-2. Tipo/Nome:
-Cidade:
-Telefone:
-Site:
-O que fornece:
-Observação:
-
-3. Tipo/Nome:
-Cidade:
-Telefone:
-Site:
-O que fornece:
-Observação:
-
-DICA FINAL:
-Confirme preços, pedido mínimo e entrega direto com o fornecedor.
+Responda em português.
 `;
 
     const resposta = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
@@ -91,21 +63,21 @@ Confirme preços, pedido mínimo e entrega direto com o fornecedor.
 
     if (!resposta.ok) {
       return res.status(500).json({
-        erro: dados.error?.message || "Erro ao chamar Gemini API."
+        erro: dados.error?.message || "Erro ao consultar Gemini"
       });
     }
 
-    const texto =
+    const resultado =
       dados?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "Nenhum resultado encontrado.";
 
     return res.status(200).json({
-      resultado: texto
+      resultado
     });
 
   } catch (erro) {
     return res.status(500).json({
-      erro: erro.message || "Erro interno."
+      erro: erro.message
     });
   }
 }
