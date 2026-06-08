@@ -8,38 +8,27 @@ export default async function handler(req, res) {
   try {
     const { busca } = req.body;
 
-    if (!busca) {
-      return res.status(400).json({
-        erro: "Informe uma busca."
-      });
-    }
-
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({
-        erro: "GEMINI_API_KEY não encontrada."
-      });
-    }
-
     const prompt = `
-Encontre fornecedores para:
+Encontre 5 fornecedores de:
 
 ${busca}
 
-Retorne:
+Retorne EXATAMENTE neste formato:
 
-- Nome da empresa
-- Cidade
-- Telefone (se existir)
-- Site (se existir)
-- O que fornece
+EMPRESA:
+CIDADE:
+TELEFONE:
+SITE:
+PRODUTOS:
 
-Responda em português.
+Não escreva introduções.
+Não escreva explicações.
+Não escreva observações.
+Apenas a lista.
 `;
 
     const resposta = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -67,12 +56,12 @@ Responda em português.
       });
     }
 
-    const resultado =
-      dados?.candidates?.[0]?.content?.parts?.[0]?.text ||
+    const texto =
+      dados.candidates?.[0]?.content?.parts?.[0]?.text ||
       "Nenhum resultado encontrado.";
 
     return res.status(200).json({
-      resultado
+      resultado: texto
     });
 
   } catch (erro) {
