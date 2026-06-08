@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     }
 
     const prompt = `
-Você é uma IA que ajuda empreendedores a encontrar fornecedores.
+Você é uma IA para ajudar empreendedores a encontrar fornecedores.
 
 Pesquisa do usuário:
 "${busca}"
@@ -33,9 +33,9 @@ Responda em português do Brasil.
 Regras:
 - Não invente telefone.
 - Não invente site.
-- Se não souber telefone ou site, coloque "não encontrado".
-- Dê caminhos reais de busca e tipos de empresas que a pessoa deve procurar.
-- Seja direto e útil.
+- Se não tiver certeza, escreva "não encontrado".
+- Dê sugestões úteis de onde procurar.
+- Seja direto.
 
 Formato:
 
@@ -63,11 +63,11 @@ O que fornece:
 Observação:
 
 DICA FINAL:
-Confirme preços, pedido mínimo, entrega e disponibilidade diretamente com o fornecedor.
+Confirme preços, pedido mínimo e entrega direto com o fornecedor.
 `;
 
     const resposta = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
