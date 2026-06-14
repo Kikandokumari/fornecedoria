@@ -19,45 +19,44 @@ body {
 }
 
 .container {
-  max-width: 760px;
+  max-width: 720px;
   margin: auto;
   background: white;
   padding: 24px;
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: 0 8px 25px rgba(0,0,0,.08);
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 8px;
-  font-size: 38px;
+  margin: 0;
+  font-size: 36px;
 }
 
 .subtitulo {
   text-align: center;
   color: #555;
-  font-size: 18px;
-  margin-bottom: 28px;
+  margin: 10px 0 25px;
 }
 
 input {
   width: 100%;
-  padding: 15px;
+  padding: 14px;
   margin-top: 12px;
   border: 1px solid #ddd;
   border-radius: 10px;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 button {
   width: 100%;
-  padding: 15px;
+  padding: 14px;
   margin-top: 16px;
   background: #16a34a;
   color: white;
   border: none;
   border-radius: 10px;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -67,26 +66,26 @@ button:hover {
 }
 
 #resultado {
-  margin-top: 24px;
+  margin-top: 22px;
 }
 
 .card {
-  background: #f0fdf4;
-  border: 1px solid #d1fae5;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 14px;
   padding: 18px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .card h2 {
   margin: 0 0 12px;
-  font-size: 22px;
+  font-size: 21px;
 }
 
 .info {
-  margin: 8px 0;
-  font-size: 16px;
-  line-height: 1.4;
+  margin: 6px 0;
+  font-size: 15px;
+  color: #333;
 }
 
 .info strong {
@@ -94,20 +93,21 @@ button:hover {
 }
 
 .acoes {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 10px;
   margin-top: 14px;
 }
 
 .btn {
-  display: block;
+  flex: 1;
   text-align: center;
-  padding: 12px;
+  padding: 11px;
   border-radius: 9px;
   text-decoration: none;
   font-weight: bold;
   font-size: 14px;
+  border: none;
+  cursor: pointer;
 }
 
 .btn-whatsapp {
@@ -115,46 +115,31 @@ button:hover {
   color: white;
 }
 
-.btn-site {
-  background: #111827;
-  color: white;
-}
-
-.btn-copiar {
+.btn-secundario {
   background: #e5e7eb;
   color: #111;
-  border: none;
 }
 
-.comparador {
-  margin-top: 28px;
-  padding: 18px;
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
-  border-radius: 14px;
+.detalhes {
   display: none;
-}
-
-.comparador h2 {
-  margin-top: 0;
-}
-
-.tabela {
-  width: 100%;
-  border-collapse: collapse;
   margin-top: 12px;
-  font-size: 14px;
+  padding: 12px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
 }
 
-.tabela th,
-.tabela td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+.loading {
+  background: #f0fdf4;
+  padding: 16px;
+  border-radius: 12px;
 }
 
-.tabela th {
-  background: #f3f4f6;
+.erro {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 16px;
+  border-radius: 12px;
 }
 
 .aviso {
@@ -162,20 +147,6 @@ button:hover {
   color: #666;
   font-size: 13px;
   text-align: center;
-}
-
-.loading {
-  background: #f0fdf4;
-  padding: 18px;
-  border-radius: 12px;
-  font-size: 18px;
-}
-
-.erro {
-  background: #fee2e2;
-  color: #991b1b;
-  padding: 18px;
-  border-radius: 12px;
 }
 
 @media (max-width: 600px) {
@@ -187,12 +158,8 @@ button:hover {
     padding: 20px;
   }
 
-  h1 {
-    font-size: 34px;
-  }
-
   .acoes {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 }
 </style>
@@ -211,35 +178,16 @@ button:hover {
 
   <div id="resultado"></div>
 
-  <div id="comparador" class="comparador">
-    <h2>Comparar valores e benefícios</h2>
-    <p>Use esta tabela para comparar os fornecedores antes de chamar.</p>
-    <table class="tabela">
-      <thead>
-        <tr>
-          <th>Empresa</th>
-          <th>Produtos</th>
-          <th>Benefícios</th>
-          <th>Faixa de preço</th>
-        </tr>
-      </thead>
-      <tbody id="tabelaComparacao"></tbody>
-    </table>
-  </div>
-
   <p class="aviso">
-    Confirme preços, disponibilidade e entrega diretamente com o fornecedor.
+    Confirme preços, entrega e disponibilidade diretamente com o fornecedor.
   </p>
 </div>
 
 <script>
-let fornecedoresAtuais = [];
-
 async function buscar() {
   const produto = document.getElementById("produto").value.trim();
   const cidade = document.getElementById("cidade").value.trim();
   const resultado = document.getElementById("resultado");
-  const comparador = document.getElementById("comparador");
 
   if (!produto || !cidade) {
     alert("Preencha o produto e a cidade.");
@@ -247,8 +195,6 @@ async function buscar() {
   }
 
   resultado.innerHTML = `<div class="loading">Pesquisando fornecedores...</div>`;
-  comparador.style.display = "none";
-  fornecedoresAtuais = [];
 
   try {
     const resposta = await fetch("/api/buscar", {
@@ -268,15 +214,14 @@ async function buscar() {
       return;
     }
 
-    fornecedoresAtuais = dados.fornecedores || [];
+    const fornecedores = dados.fornecedores || [];
 
-    if (!fornecedoresAtuais.length) {
+    if (!fornecedores.length) {
       resultado.innerHTML = `<div class="erro">Nenhum fornecedor encontrado.</div>`;
       return;
     }
 
-    mostrarFornecedores(fornecedoresAtuais);
-    montarComparador(fornecedoresAtuais);
+    mostrarFornecedores(fornecedores);
 
   } catch (erro) {
     resultado.innerHTML = `<div class="erro">Erro ao buscar fornecedores. Tente novamente.</div>`;
@@ -292,61 +237,50 @@ function mostrarFornecedores(lista) {
     const siteValido = f.site && f.site !== "não encontrado";
 
     const whatsappUrl = temWhatsapp
-      ? `https://wa.me/${f.whatsappLink}?text=${encodeURIComponent("Olá, encontrei sua empresa pelo FornecedorIA. Gostaria de saber valores, benefícios e condições de fornecimento.")}`
+      ? `https://wa.me/${f.whatsappLink}?text=${encodeURIComponent("Olá, encontrei sua empresa pelo FornecedorIA. Gostaria de saber valores e condições de fornecimento.")}`
       : "";
 
-    const siteUrl = siteValido
-      ? normalizarSite(f.site)
-      : "";
+    const siteUrl = siteValido ? normalizarSite(f.site) : "";
 
     resultado.innerHTML += `
       <div class="card">
         <h2>${f.empresa || "Empresa não encontrada"}</h2>
 
         <p class="info"><strong>Cidade:</strong> ${f.cidade || "não encontrado"}</p>
-        <p class="info"><strong>Telefone:</strong> ${f.telefone || "não encontrado"}</p>
-        <p class="info"><strong>WhatsApp:</strong> ${f.whatsapp || "não encontrado"}</p>
-        <p class="info"><strong>Site:</strong> ${f.site || "não encontrado"}</p>
         <p class="info"><strong>Produtos:</strong> ${f.produtos || "não encontrado"}</p>
-        <p class="info"><strong>Benefícios:</strong> ${f.beneficios || "consultar fornecedor"}</p>
-        <p class="info"><strong>Faixa de preço:</strong> ${f.faixaPreco || "consultar fornecedor"}</p>
 
         <div class="acoes">
           ${
             temWhatsapp
-              ? `<a class="btn btn-whatsapp" href="${whatsappUrl}" target="_blank">Chamar no WhatsApp</a>`
-              : `<button class="btn btn-copiar" onclick="copiarTexto('${limparAspas(f.telefone)}')">Copiar telefone</button>`
+              ? `<a class="btn btn-whatsapp" href="${whatsappUrl}" target="_blank">WhatsApp</a>`
+              : `<button class="btn btn-secundario" onclick="copiarTexto('${limparTexto(f.telefone)}')">Copiar telefone</button>`
           }
 
-          ${
+          <button class="btn btn-secundario" onclick="toggleDetalhes(${index})">Saiba mais</button>
+        </div>
+
+        <div id="detalhes-${index}" class="detalhes">
+          <p class="info"><strong>Telefone:</strong> ${f.telefone || "não encontrado"}</p>
+          <p class="info"><strong>WhatsApp:</strong> ${f.whatsapp || "não encontrado"}</p>
+          <p class="info"><strong>Site:</strong> ${
             siteValido
-              ? `<a class="btn btn-site" href="${siteUrl}" target="_blank">Abrir site</a>`
-              : `<button class="btn btn-copiar" onclick="copiarTexto('${limparAspas(f.empresa)}')">Copiar empresa</button>`
-          }
+              ? `<a href="${siteUrl}" target="_blank">${f.site}</a>`
+              : "não encontrado"
+          }</p>
         </div>
       </div>
     `;
   });
 }
 
-function montarComparador(lista) {
-  const comparador = document.getElementById("comparador");
-  const tabela = document.getElementById("tabelaComparacao");
+function toggleDetalhes(index) {
+  const detalhes = document.getElementById(`detalhes-${index}`);
 
-  tabela.innerHTML = "";
-
-  lista.forEach(f => {
-    tabela.innerHTML += `
-      <tr>
-        <td>${f.empresa || "não encontrado"}</td>
-        <td>${f.produtos || "não encontrado"}</td>
-        <td>${f.beneficios || "consultar fornecedor"}</td>
-        <td>${f.faixaPreco || "consultar fornecedor"}</td>
-      </tr>
-    `;
-  });
-
-  comparador.style.display = "block";
+  if (detalhes.style.display === "block") {
+    detalhes.style.display = "none";
+  } else {
+    detalhes.style.display = "block";
+  }
 }
 
 function normalizarSite(site) {
@@ -360,11 +294,16 @@ function normalizarSite(site) {
 }
 
 function copiarTexto(texto) {
+  if (!texto || texto === "não encontrado") {
+    alert("Telefone não encontrado.");
+    return;
+  }
+
   navigator.clipboard.writeText(texto);
   alert("Copiado!");
 }
 
-function limparAspas(texto) {
+function limparTexto(texto) {
   return String(texto || "").replace(/'/g, "").replace(/"/g, "");
 }
 </script>
