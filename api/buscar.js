@@ -29,14 +29,11 @@ TELEFONE:
 WHATSAPP:
 SITE:
 PRODUTOS:
-BENEFÍCIOS:
-FAIXA DE PREÇO:
 
 Regras:
 - Não escreva introdução.
 - Não escreva conclusão.
 - Não escreva dica.
-- Não escreva "fornecedor de tal tal".
 - Não use markdown.
 - Não use asteriscos.
 - Não use numeração.
@@ -44,8 +41,6 @@ Regras:
 - Se não souber WhatsApp, coloque: não encontrado
 - Se não souber site, coloque: não encontrado
 - Em WHATSAPP, coloque apenas celular brasileiro se encontrar.
-- Em TELEFONE, coloque telefone fixo ou comercial.
-- Em FAIXA DE PREÇO, coloque apenas estimativa geral se souber, senão: consultar fornecedor
 - Separe cada empresa com uma linha em branco.
 `;
 
@@ -75,12 +70,10 @@ Regras:
       if (resposta.ok) {
         let texto = dados?.candidates?.[0]?.content?.parts?.[0]?.text || "";
         texto = limparResposta(texto);
+
         const fornecedores = extrairFornecedores(texto);
 
-        return res.status(200).json({
-          resultado: texto,
-          fornecedores
-        });
+        return res.status(200).json({ fornecedores });
       }
 
       ultimoErro = dados?.error?.message || "Erro desconhecido.";
@@ -113,18 +106,14 @@ function extrairCampo(bloco, campo) {
 }
 
 function limparNumero(numero) {
-  return (numero || "").replace(/\D/g, "");
+  return String(numero || "").replace(/\D/g, "");
 }
 
-function formatarTelefone(numero) {
+function formatarNumero(numero) {
   const limpo = limparNumero(numero);
 
   if (limpo.length === 13 && limpo.startsWith("55")) {
     return `(${limpo.slice(2, 4)}) ${limpo.slice(4, 9)}-${limpo.slice(9)}`;
-  }
-
-  if (limpo.length === 12 && limpo.startsWith("55")) {
-    return `(${limpo.slice(2, 4)}) ${limpo.slice(4, 8)}-${limpo.slice(8)}`;
   }
 
   if (limpo.length === 11) {
@@ -152,7 +141,7 @@ function pareceWhatsapp(numero) {
   return false;
 }
 
-function numeroParaWaMe(numero) {
+function numeroWhatsapp(numero) {
   let limpo = limparNumero(numero);
 
   if (limpo.length === 11) {
@@ -174,27 +163,21 @@ function extrairFornecedores(texto) {
   return blocos.map(bloco => {
     const empresa = extrairCampo(bloco, "EMPRESA");
     const cidade = extrairCampo(bloco, "CIDADE");
-    const telefoneOriginal = extrairCampo(bloco, "TELEFONE");
-    const whatsappOriginal = extrairCampo(bloco, "WHATSAPP");
+    const telefone = extrairCampo(bloco, "TELEFONE");
+    const whatsapp = extrairCampo(bloco, "WHATSAPP");
     const site = extrairCampo(bloco, "SITE");
     const produtos = extrairCampo(bloco, "PRODUTOS");
-    const beneficios = extrairCampo(bloco, "BENEFÍCIOS");
-    const faixaPreco = extrairCampo(bloco, "FAIXA DE PREÇO");
 
-    const whatsappValido = pareceWhatsapp(whatsappOriginal);
-    const whatsappFormatado = whatsappValido ? formatarTelefone(whatsappOriginal) : "não encontrado";
-    const telefoneFormatado = formatarTelefone(telefoneOriginal);
+    const whatsappValido = pareceWhatsapp(whatsapp);
 
     return {
       empresa,
       cidade,
-      telefone: telefoneFormatado,
-      whatsapp: whatsappFormatado,
-      whatsappLink: whatsappValido ? numeroParaWaMe(whatsappOriginal) : "",
+      telefone: formatarNumero(telefone),
+      whatsapp: whatsappValido ? formatarNumero(whatsapp) : "não encontrado",
+      whatsappLink: whatsappValido ? numeroWhatsapp(whatsapp) : "",
       site,
-      produtos,
-      beneficios,
-      faixaPreco
+      produtos
     };
   });
 }
