@@ -33,11 +33,41 @@ body {
   border: 1px solid #1f2937;
 }
 
-h1 {
+.logo-area {
   text-align: center;
-  margin: 0;
+  margin-bottom: 8px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 38px;
+  height: 38px;
+  border: 2px solid #22c55e;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #22c55e;
+  font-size: 21px;
+  font-weight: bold;
+  box-shadow: 0 0 18px rgba(34,197,94,.25);
+}
+
+.logo-text {
   font-size: 38px;
+  font-weight: 800;
   color: #ffffff;
+  letter-spacing: -1px;
+}
+
+.logo-text span {
+  color: #22c55e;
 }
 
 .subtitulo {
@@ -119,13 +149,13 @@ button:hover {
 }
 
 .acoes {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-top: 14px;
 }
 
 .btn {
-  flex: 1;
   text-align: center;
   padding: 11px;
   border-radius: 9px;
@@ -139,6 +169,11 @@ button:hover {
 .btn-whatsapp {
   background: #22c55e;
   color: #052e16;
+}
+
+.btn-maps {
+  background: #14532d;
+  color: #dcfce7;
 }
 
 .btn-secundario {
@@ -240,12 +275,12 @@ button:hover {
     padding: 20px;
   }
 
-  h1 {
+  .logo-text {
     font-size: 34px;
   }
 
   .acoes {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .tabela {
@@ -258,7 +293,12 @@ button:hover {
 <body>
 
 <div class="container">
-  <h1>FornecedorIA</h1>
+  <div class="logo-area">
+    <div class="logo">
+      <div class="logo-icon">F</div>
+      <div class="logo-text">Fornecedor<span>IA</span></div>
+    </div>
+  </div>
 
   <p class="subtitulo">
     Encontre fornecedores para seu negócio usando IA.
@@ -364,6 +404,7 @@ function mostrarFornecedores(lista) {
       ? `https://wa.me/${f.whatsappLink}?text=${encodeURIComponent("Olá, encontrei sua empresa pelo FornecedorIA. Gostaria de saber valores e condições de fornecimento.")}`
       : "";
 
+    const mapsUrl = criarLinkMaps(f.empresa, f.cidade);
     const siteUrl = siteValido ? normalizarSite(f.site) : "";
 
     resultado.innerHTML += `
@@ -385,6 +426,8 @@ function mostrarFornecedores(lista) {
               ? `<a class="btn btn-whatsapp" href="${whatsappUrl}" target="_blank">WhatsApp</a>`
               : `<button class="btn btn-secundario" onclick="copiarTexto('${limparTexto(f.telefone)}')">Copiar telefone</button>`
           }
+
+          <a class="btn btn-maps" href="${mapsUrl}" target="_blank">Google Maps</a>
 
           <button class="btn btn-secundario" onclick="toggleDetalhes(${index})">Saiba mais</button>
         </div>
@@ -415,6 +458,11 @@ function montarTabela(lista) {
   });
 
   comparador.style.display = "block";
+}
+
+function criarLinkMaps(empresa, cidade) {
+  const busca = `${empresa || ""} ${cidade || ""}`.trim();
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(busca)}`;
 }
 
 function toggleDetalhes(index) {
