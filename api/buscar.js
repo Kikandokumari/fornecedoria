@@ -29,6 +29,8 @@ TELEFONE:
 WHATSAPP:
 SITE:
 PRODUTOS:
+FAIXA_PRECO:
+BENEFICIOS:
 
 Regras:
 - Não escreva introdução.
@@ -40,8 +42,9 @@ Regras:
 - Se não souber telefone, coloque: não encontrado
 - Se não souber WhatsApp, coloque: não encontrado
 - Se não souber site, coloque: não encontrado
-- Em WHATSAPP, coloque apenas celular brasileiro se encontrar.
-- Separe cada empresa com uma linha em branco.
+- FAIXA_PRECO pode ser estimativa simples, exemplo: R$16-R$70
+- BENEFICIOS deve ser curto, mas útil. Exemplo: Entrega rápida, atende bares, pedido mínimo baixo
+- Separe cada fornecedor com uma linha em branco.
 `;
 
     const modelos = [
@@ -167,6 +170,8 @@ function extrairFornecedores(texto) {
     const whatsapp = extrairCampo(bloco, "WHATSAPP");
     const site = extrairCampo(bloco, "SITE");
     const produtos = extrairCampo(bloco, "PRODUTOS");
+    const faixaPreco = extrairCampo(bloco, "FAIXA_PRECO");
+    const beneficios = extrairCampo(bloco, "BENEFICIOS");
 
     const whatsappValido = pareceWhatsapp(whatsapp);
 
@@ -177,7 +182,9 @@ function extrairFornecedores(texto) {
       whatsapp: whatsappValido ? formatarNumero(whatsapp) : "não encontrado",
       whatsappLink: whatsappValido ? numeroWhatsapp(whatsapp) : "",
       site,
-      produtos
+      produtos,
+      faixaPreco,
+      beneficios
     };
   });
 }
