@@ -19,7 +19,7 @@ body {
 }
 
 .container {
-  max-width: 720px;
+  max-width: 760px;
   margin: auto;
   background: white;
   padding: 24px;
@@ -83,7 +83,7 @@ button:hover {
 }
 
 .info {
-  margin: 6px 0;
+  margin: 7px 0;
   font-size: 15px;
   color: #333;
 }
@@ -129,6 +129,44 @@ button:hover {
   border: 1px solid #e5e7eb;
 }
 
+.comparador {
+  display: none;
+  margin-top: 26px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+
+.comparador h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.comparador p {
+  margin: 0 0 14px;
+  color: #666;
+  font-size: 14px;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabela th,
+.tabela td {
+  border: 1px solid #e5e7eb;
+  padding: 9px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.tabela th {
+  background: #f3f4f6;
+}
+
 .loading {
   background: #f0fdf4;
   padding: 16px;
@@ -161,6 +199,10 @@ button:hover {
   .acoes {
     flex-direction: column;
   }
+
+  .tabela {
+    font-size: 12px;
+  }
 }
 </style>
 </head>
@@ -171,12 +213,29 @@ button:hover {
   <h1>FornecedorIA</h1>
   <p class="subtitulo">Encontre fornecedores para seu negócio usando IA.</p>
 
-  <input id="produto" placeholder="Ex: fornecedor de bebidas">
+  <input id="produto" placeholder="Ex: fornecedor de água e gás">
   <input id="cidade" placeholder="Ex: Uberlândia">
 
   <button onclick="buscar()">Buscar fornecedores</button>
 
   <div id="resultado"></div>
+
+  <div id="comparador" class="comparador">
+    <h2>Comparar valores e benefícios</h2>
+    <p>Use esta tabela para comparar os fornecedores antes de chamar.</p>
+
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Empresa</th>
+          <th>Produtos</th>
+          <th>Benefícios</th>
+          <th>Faixa de preço</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabela"></tbody>
+    </table>
+  </div>
 
   <p class="aviso">
     Confirme preços, entrega e disponibilidade diretamente com o fornecedor.
@@ -188,6 +247,7 @@ async function buscar() {
   const produto = document.getElementById("produto").value.trim();
   const cidade = document.getElementById("cidade").value.trim();
   const resultado = document.getElementById("resultado");
+  const comparador = document.getElementById("comparador");
 
   if (!produto || !cidade) {
     alert("Preencha o produto e a cidade.");
@@ -195,6 +255,7 @@ async function buscar() {
   }
 
   resultado.innerHTML = `<div class="loading">Pesquisando fornecedores...</div>`;
+  comparador.style.display = "none";
 
   try {
     const resposta = await fetch("/api/buscar", {
@@ -222,6 +283,7 @@ async function buscar() {
     }
 
     mostrarFornecedores(fornecedores);
+    montarTabela(fornecedores);
 
   } catch (erro) {
     resultado.innerHTML = `<div class="erro">Erro ao buscar fornecedores. Tente novamente.</div>`;
@@ -247,7 +309,13 @@ function mostrarFornecedores(lista) {
         <h2>${f.empresa || "Empresa não encontrada"}</h2>
 
         <p class="info"><strong>Cidade:</strong> ${f.cidade || "não encontrado"}</p>
+        <p class="info"><strong>Telefone:</strong> ${f.telefone || "não encontrado"}</p>
+        <p class="info"><strong>WhatsApp:</strong> ${f.whatsapp || "não encontrado"}</p>
+        <p class="info"><strong>Site:</strong> ${
+          siteValido ? `<a href="${siteUrl}" target="_blank">${f.site}</a>` : "não encontrado"
+        }</p>
         <p class="info"><strong>Produtos:</strong> ${f.produtos || "não encontrado"}</p>
+        <p class="info"><strong>Faixa de preço:</strong> ${f.faixaPreco || "consultar fornecedor"}</p>
 
         <div class="acoes">
           ${
@@ -260,27 +328,36 @@ function mostrarFornecedores(lista) {
         </div>
 
         <div id="detalhes-${index}" class="detalhes">
-          <p class="info"><strong>Telefone:</strong> ${f.telefone || "não encontrado"}</p>
-          <p class="info"><strong>WhatsApp:</strong> ${f.whatsapp || "não encontrado"}</p>
-          <p class="info"><strong>Site:</strong> ${
-            siteValido
-              ? `<a href="${siteUrl}" target="_blank">${f.site}</a>`
-              : "não encontrado"
-          }</p>
+          <p class="info"><strong>Benefícios:</strong> ${f.beneficios || "consultar fornecedor"}</p>
         </div>
       </div>
     `;
   });
 }
 
+function montarTabela(lista) {
+  const comparador = document.getElementById("comparador");
+  const corpoTabela = document.getElementById("corpoTabela");
+
+  corpoTabela.innerHTML = "";
+
+  lista.forEach(f => {
+    corpoTabela.innerHTML += `
+      <tr>
+        <td>${f.empresa || "não encontrado"}</td>
+        <td>${f.produtos || "não encontrado"}</td>
+        <td>${f.beneficios || "consultar fornecedor"}</td>
+        <td>${f.faixaPreco || "consultar fornecedor"}</td>
+      </tr>
+    `;
+  });
+
+  comparador.style.display = "block";
+}
+
 function toggleDetalhes(index) {
   const detalhes = document.getElementById(`detalhes-${index}`);
-
-  if (detalhes.style.display === "block") {
-    detalhes.style.display = "none";
-  } else {
-    detalhes.style.display = "block";
-  }
+  detalhes.style.display = detalhes.style.display === "block" ? "none" : "block";
 }
 
 function normalizarSite(site) {
