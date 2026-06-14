@@ -13,9 +13,7 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({
-        erro: "GEMINI_API_KEY não encontrada no Vercel."
-      });
+      return res.status(500).json({ erro: "GEMINI_API_KEY não encontrada." });
     }
 
     const prompt = `
@@ -28,18 +26,27 @@ Responda SOMENTE neste formato:
 EMPRESA:
 CIDADE:
 TELEFONE:
+WHATSAPP:
 SITE:
 PRODUTOS:
+BENEFÍCIOS:
+FAIXA DE PREÇO:
 
 Regras:
 - Não escreva introdução.
 - Não escreva conclusão.
 - Não escreva dica.
+- Não escreva "fornecedor de tal tal".
 - Não use markdown.
 - Não use asteriscos.
-- Se não encontrar telefone, escreva: não encontrado
-- Se não encontrar site, escreva: não encontrado
-- Separe cada fornecedor com uma linha em branco.
+- Não use numeração.
+- Se não souber telefone, coloque: não encontrado
+- Se não souber WhatsApp, coloque: não encontrado
+- Se não souber site, coloque: não encontrado
+- Em WHATSAPP, coloque apenas celular brasileiro se encontrar.
+- Em TELEFONE, coloque telefone fixo ou comercial.
+- Em FAIXA DE PREÇO, coloque apenas estimativa geral se souber, senão: consultar fornecedor
+- Separe cada empresa com uma linha em branco.
 `;
 
     const modelos = [
@@ -56,15 +63,9 @@ Regras:
         `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${apiKey}`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [
-              {
-                parts: [{ text: prompt }]
-              }
-            ]
+            contents: [{ parts: [{ text: prompt }] }]
           })
         }
       );
@@ -72,28 +73,23 @@ Regras:
       const dados = await resposta.json();
 
       if (resposta.ok) {
-        let texto =
-          dados?.candidates?.[0]?.content?.parts?.[0]?.text ||
-          "Nenhum resultado encontrado.";
-
+        let texto = dados?.candidates?.[0]?.content?.parts?.[0]?.text || "";
         texto = limparResposta(texto);
+        const fornecedores = extrairFornecedores(texto);
 
         return res.status(200).json({
-          resultado: texto
+          resultado: texto,
+          fornecedores
         });
       }
 
       ultimoErro = dados?.error?.message || "Erro desconhecido.";
     }
 
-    return res.status(500).json({
-      erro: ultimoErro
-    });
+    return res.status(500).json({ erro: ultimoErro });
 
   } catch (erro) {
-    return res.status(500).json({
-      erro: erro.message || "Erro interno."
-    });
+    return res.status(500).json({ erro: erro.message || "Erro interno." });
   }
 }
 
@@ -106,8 +102,99 @@ function limparResposta(texto) {
     .replace(/Abaixo estão.*?(?=EMPRESA:)/gis, "")
     .replace(/Dica:.*$/gis, "")
     .replace(/Observação:.*$/gis, "")
-    .replace(/É sempre recomendável.*$/gis, "")
-    .replace(/Além dessas.*$/gis, "")
     .replace(/^\d+\.\s*/gm, "")
     .trim();
+}
+
+function extrairCampo(bloco, campo) {
+  const regex = new RegExp(`${campo}:\\s*(.*)`, "i");
+  const match = bloco.match(regex);
+  return match ? match[1].trim() : "não encontrado";
+}
+
+function limparNumero(numero) {
+  return (numero || "").replace(/\D/g, "");
+}
+
+function formatarTelefone(numero) {
+  const limpo = limparNumero(numero);
+
+  if (limpo.length === 13 && limpo.startsWith("55")) {
+    return `(${limpo.slice(2, 4)}) ${limpo.slice(4, 9)}-${limpo.slice(9)}`;
+  }
+
+  if (limpo.length === 12 && limpo.startsWith("55")) {
+    return `(${limpo.slice(2, 4)}) ${limpo.slice(4, 8)}-${limpo.slice(8)}`;
+  }
+
+  if (limpo.length === 11) {
+    return `(${limpo.slice(0, 2)}) ${limpo.slice(2, 7)}-${limpo.slice(7)}`;
+  }
+
+  if (limpo.length === 10) {
+    return `(${limpo.slice(0, 2)}) ${limpo.slice(2, 6)}-${limpo.slice(6)}`;
+  }
+
+  return "não encontrado";
+}
+
+function pareceWhatsapp(numero) {
+  const limpo = limparNumero(numero);
+
+  if (limpo.length === 13 && limpo.startsWith("55")) {
+    return limpo[4] === "9";
+  }
+
+  if (limpo.length === 11) {
+    return limpo[2] === "9";
+  }
+
+  return false;
+}
+
+function numeroParaWaMe(numero) {
+  let limpo = limparNumero(numero);
+
+  if (limpo.length === 11) {
+    limpo = "55" + limpo;
+  }
+
+  if (limpo.length === 13 && limpo.startsWith("55")) {
+    return limpo;
+  }
+
+  return "";
+}
+
+function extrairFornecedores(texto) {
+  const blocos = texto
+    .split(/\n\s*\n/)
+    .filter(bloco => bloco.toUpperCase().includes("EMPRESA:"));
+
+  return blocos.map(bloco => {
+    const empresa = extrairCampo(bloco, "EMPRESA");
+    const cidade = extrairCampo(bloco, "CIDADE");
+    const telefoneOriginal = extrairCampo(bloco, "TELEFONE");
+    const whatsappOriginal = extrairCampo(bloco, "WHATSAPP");
+    const site = extrairCampo(bloco, "SITE");
+    const produtos = extrairCampo(bloco, "PRODUTOS");
+    const beneficios = extrairCampo(bloco, "BENEFÍCIOS");
+    const faixaPreco = extrairCampo(bloco, "FAIXA DE PREÇO");
+
+    const whatsappValido = pareceWhatsapp(whatsappOriginal);
+    const whatsappFormatado = whatsappValido ? formatarTelefone(whatsappOriginal) : "não encontrado";
+    const telefoneFormatado = formatarTelefone(telefoneOriginal);
+
+    return {
+      empresa,
+      cidade,
+      telefone: telefoneFormatado,
+      whatsapp: whatsappFormatado,
+      whatsappLink: whatsappValido ? numeroParaWaMe(whatsappOriginal) : "",
+      site,
+      produtos,
+      beneficios,
+      faixaPreco
+    };
+  });
 }
