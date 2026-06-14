@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FornecedorIA</title>
+
+<title>FornecedorIA - Encontre fornecedores de água, gás, bebidas e produtos</title>
+
+<meta name="description" content="Encontre fornecedores de água, gás, bebidas, alimentos, descartáveis e produtos para comércio. Compare valores, benefícios, telefones, WhatsApp e sites de fornecedores na sua cidade.">
+<meta name="keywords" content="fornecedores, fornecedor de água, fornecedor de gás, fornecedor de bebidas, fornecedores em Uberlândia, distribuidora, atacado, produtos para comércio, fornecedor para bar, fornecedor para mercado">
+<meta name="author" content="FornecedorIA">
 
 <style>
 * {
@@ -12,48 +17,64 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: #f4f5f7;
+  background: #0f172a;
   margin: 0;
   padding: 20px;
-  color: #111;
+  color: #f8fafc;
 }
 
 .container {
-  max-width: 760px;
+  max-width: 780px;
   margin: auto;
-  background: white;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(0,0,0,.08);
+  background: #111827;
+  padding: 26px;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(0,0,0,.35);
+  border: 1px solid #1f2937;
 }
 
 h1 {
   text-align: center;
   margin: 0;
-  font-size: 36px;
+  font-size: 38px;
+  color: #ffffff;
 }
 
 .subtitulo {
   text-align: center;
-  color: #555;
-  margin: 10px 0 25px;
+  color: #cbd5e1;
+  margin: 10px 0 12px;
+}
+
+.descricao {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 25px;
 }
 
 input {
   width: 100%;
-  padding: 14px;
+  padding: 15px;
   margin-top: 12px;
-  border: 1px solid #ddd;
+  background: #020617;
+  color: white;
+  border: 1px solid #334155;
   border-radius: 10px;
   font-size: 16px;
 }
 
+input::placeholder {
+  color: #64748b;
+}
+
 button {
   width: 100%;
-  padding: 14px;
+  padding: 15px;
   margin-top: 16px;
-  background: #16a34a;
-  color: white;
+  background: #22c55e;
+  color: #052e16;
   border: none;
   border-radius: 10px;
   font-size: 16px;
@@ -62,7 +83,7 @@ button {
 }
 
 button:hover {
-  background: #15803d;
+  background: #16a34a;
 }
 
 #resultado {
@@ -70,8 +91,8 @@ button:hover {
 }
 
 .card {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: #020617;
+  border: 1px solid #1e293b;
   border-radius: 14px;
   padding: 18px;
   margin-bottom: 14px;
@@ -80,16 +101,21 @@ button:hover {
 .card h2 {
   margin: 0 0 12px;
   font-size: 21px;
+  color: #ffffff;
 }
 
 .info {
   margin: 7px 0;
   font-size: 15px;
-  color: #333;
+  color: #cbd5e1;
 }
 
 .info strong {
-  color: #111;
+  color: #ffffff;
+}
+
+.info a {
+  color: #38bdf8;
 }
 
 .acoes {
@@ -111,41 +137,42 @@ button:hover {
 }
 
 .btn-whatsapp {
-  background: #16a34a;
-  color: white;
+  background: #22c55e;
+  color: #052e16;
 }
 
 .btn-secundario {
-  background: #e5e7eb;
-  color: #111;
+  background: #1e293b;
+  color: #f8fafc;
 }
 
 .detalhes {
   display: none;
   margin-top: 12px;
   padding: 12px;
-  background: white;
+  background: #0f172a;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #1e293b;
 }
 
 .comparador {
   display: none;
   margin-top: 26px;
   padding: 16px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: #020617;
+  border: 1px solid #1e293b;
   border-radius: 14px;
 }
 
 .comparador h2 {
   margin: 0 0 6px;
   font-size: 20px;
+  color: #ffffff;
 }
 
 .comparador p {
   margin: 0 0 14px;
-  color: #666;
+  color: #94a3b8;
   font-size: 14px;
 }
 
@@ -157,34 +184,51 @@ button:hover {
 
 .tabela th,
 .tabela td {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #1e293b;
   padding: 9px;
   text-align: left;
   vertical-align: top;
 }
 
 .tabela th {
-  background: #f3f4f6;
+  background: #111827;
+  color: #ffffff;
+}
+
+.tabela td {
+  color: #cbd5e1;
 }
 
 .loading {
-  background: #f0fdf4;
+  background: #052e16;
+  color: #bbf7d0;
   padding: 16px;
   border-radius: 12px;
 }
 
 .erro {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #450a0a;
+  color: #fecaca;
   padding: 16px;
   border-radius: 12px;
 }
 
 .aviso {
   margin-top: 18px;
-  color: #666;
+  color: #94a3b8;
   font-size: 13px;
   text-align: center;
+}
+
+.seo-texto {
+  margin-top: 30px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  color: #94a3b8;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 @media (max-width: 600px) {
@@ -194,6 +238,10 @@ button:hover {
 
   .container {
     padding: 20px;
+  }
+
+  h1 {
+    font-size: 34px;
   }
 
   .acoes {
@@ -211,9 +259,17 @@ button:hover {
 
 <div class="container">
   <h1>FornecedorIA</h1>
-  <p class="subtitulo">Encontre fornecedores para seu negócio usando IA.</p>
 
-  <input id="produto" placeholder="Ex: fornecedor de água e gás">
+  <p class="subtitulo">
+    Encontre fornecedores para seu negócio usando IA.
+  </p>
+
+  <p class="descricao">
+    Pesquise fornecedores de água, gás, bebidas, alimentos, descartáveis e produtos para comércio.
+    Compare contatos, valores, benefícios e opções disponíveis na sua cidade.
+  </p>
+
+  <input id="produto" placeholder="Ex: fornecedor de água, gás ou bebidas">
   <input id="cidade" placeholder="Ex: Uberlândia">
 
   <button onclick="buscar()">Buscar fornecedores</button>
@@ -240,6 +296,12 @@ button:hover {
   <p class="aviso">
     Confirme preços, entrega e disponibilidade diretamente com o fornecedor.
   </p>
+
+  <div class="seo-texto">
+    O FornecedorIA ajuda empreendedores, bares, mercados, restaurantes, distribuidoras e pequenos comércios
+    a encontrar fornecedores de água mineral, gás, bebidas, alimentos, descartáveis e produtos para revenda.
+    Pesquise por cidade e compare opções antes de entrar em contato.
+  </div>
 </div>
 
 <script>
